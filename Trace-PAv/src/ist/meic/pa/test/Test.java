@@ -22,10 +22,10 @@ public class Test {
 
 	public void test() {
 
-		// Trace.print(foo());
-		Object b = bar();
+		Trace.print(foo());
+		Object b = identity(bar());
 		Trace.print(b);
-		// Trace.print(identity(b));
+		//Trace.print(identity(b));
 	}
 
 }
