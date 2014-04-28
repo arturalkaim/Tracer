@@ -3,6 +3,11 @@ package ist.meic.pa.test;
 import ist.meic.pa.Trace;
 
 public class Test {
+
+	public Test() {
+		// System.out.println("NEW TEST");
+	}
+
 	public Object foo() {
 		return new String("Foo");
 	}
@@ -16,9 +21,11 @@ public class Test {
 	}
 
 	public void test() {
-		Trace.print(foo());
+
+		// Trace.print(foo());
 		Object b = bar();
-		Trace.print(identity(b));
+		Trace.print(b);
+		// Trace.print(identity(b));
 	}
 
 }
