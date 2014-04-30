@@ -97,9 +97,9 @@ public class TraceTranslator implements Translator {
 						if (m.getClassName().startsWith("ist.meic.pa.History")
 								|| 
 								m.getMethod().getLongName()
-										.startsWith("java.util")
+										.startsWith("java.lang")
 								|| m.getMethod().getLongName()
-										.startsWith("java.lang"))
+										.startsWith("java.util"))
 							return;
 
 						/*System.out.println(m.getMethodName() + " "
