@@ -22,7 +22,7 @@ class Test1 {
 		for (Object obj : m.values()) {
 			System.out.println(obj);
 		}
-
+//		System.out.println(m.get(2));
 		Trace.print(o);
 
 	}

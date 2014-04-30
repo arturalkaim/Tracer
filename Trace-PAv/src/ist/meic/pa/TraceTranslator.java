@@ -97,17 +97,17 @@ public class TraceTranslator implements Translator {
 						if (m.getClassName().startsWith("ist.meic.pa.History")
 								|| 
 								m.getMethod().getLongName()
-										.startsWith("java.lang")
-								|| m.getMethod().getLongName()
-										.startsWith("java.util"))
+										.startsWith("java.lang"))
+								/*|| m.getMethod().getLongName()
+										.startsWith("java.util"))*/
 							return;
 
-						/*System.out.println(m.getMethodName() + " "
+						System.out.println(m.getMethodName() + " "
 								//+ m.getMethod().getDeclaringClass() + "  "
 								+ m.getFileName() + " at line: "
-								+ m.getLineNumber());*/
+								+ m.getLineNumber());
 
-						String methodCall = "$_=$proceed($$);";
+						String methodCall = "";
 						for (int i = 1; i <= m.getMethod().getParameterTypes().length; i++) {
 							methodCall += " if(!$" + i
 									+ ".getClass().isPrimitive()) "
@@ -117,7 +117,7 @@ public class TraceTranslator implements Translator {
 									+ m.getFileName() + ":" + m.getLineNumber()
 									+ "\"); ";
 						}
-						methodCall += "if($_ != null && !$_.getClass().isPrimitive()) "
+						methodCall += "$_=$proceed($$);if($_ != null && !$_.getClass().isPrimitive()) "
 								+ "new ist.meic.pa.History().saveObject($_,\" <- "
 								+ m.getMethod().getLongName()
 								+ " on "
