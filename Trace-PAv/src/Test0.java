@@ -3,7 +3,7 @@ import ist.meic.pa.Trace;
 class Test1 {
 
 	public Test1() {
-		// System.out.println("NEW TEST");
+		System.out.println("NEW TEST");
 	}
 
 	public Object foo() {
