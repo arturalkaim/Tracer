@@ -1,8 +1,8 @@
 import ist.meic.pa.Trace;
 
-class Test {
+class Test1 {
 
-	public Test() {
+	public Test1() {
 		// System.out.println("NEW TEST");
 	}
 
@@ -29,7 +29,7 @@ class Test {
 public class Test0 {
 
 	public static void main(String[] args) {
-		(new Test()).test();
+		(new Test1()).test();
 	}
 
 }

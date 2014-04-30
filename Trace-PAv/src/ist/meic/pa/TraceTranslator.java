@@ -31,38 +31,10 @@ public class TraceTranslator implements Translator {
 			methodSaveArgs = "";
 			methodSaveReturn = "";
 			if (ctMethod.isEmpty()
-					|| Modifier.isNative(ctMethod.getModifiers()))
+					|| Modifier.isNative(ctMethod.getModifiers())
+					|| Modifier.isTransient(ctMethod.getModifiers()))
 				continue;
-			/*
-			 * System.out.println(ctMethod.getLongName() + "   " +
-			 * ctMethod.getParameterTypes().length); /* if
-			 * (ctMethod.getParameterTypes().length == 0) continue;
-			 * 
-			 * for (int i = 1; i <= ctMethod.getParameterTypes().length; i++) {
-			 * methodSaveArgs += " new ist.meic.pa.History().saveObject(\"-> " +
-			 * ctMethod.getLongName() + "\",$" + i + ");"; }
-			 * ctMethod.insertBefore(methodSaveArgs);
-			 * 
-			 * /* methodSaveArgs +=
-			 * " new ist.meic.pa.History().saveObject($_,\"-> " +
-			 * ctMethod.getLongName() + " on " + ctMethod.getGenericSignature()
-			 * + ":" + ctMethod.getMethodInfo().getLineNumber(0) + "\");";
-			 */
-			/*methodSaveReturn += " new ist.meic.pa.History().saveObject(\"<- "
-					+ ctMethod.getLongName() + " on \",$_ );";
-			/*
-			 * methodSaveReturn = "try {" +
-			 * " Class ca = Class.forName(\"ist.meic.pa.History\");" +
-			 * "	java.lang.reflect.Method ca = ca.getMethod(\"saveObject\", new Class[]{Object.class,String.class}); "
-			 * + "ca.setAccessible(true);" +
-			 * "ca.invoke(null, new Object[] {$_	, \"<- " +
-			 * ctMethod.getLongName() + " on " + ctMethod.getDeclaringClass() +
-			 * ":" + ctMethod.getMethodInfo().getLineNumber(0) + "\"});" +
-			 * "	} catch (ClassNotFoundException e) {" +
-			 * "		e.printStackTrace();" + "	} catch (NoSuchMethodException e) {"
-			 * + "		e.printStackTrace();" + "	} catch (SecurityException e) {" +
-			 * "		e.printStackTrace();" + "	}";
-			 */
+
 			ctMethod.insertAfter(methodSaveReturn);
 
 			ctMethod.instrument(new ExprEditor() {
@@ -77,14 +49,13 @@ public class TraceTranslator implements Translator {
 					 */
 					try {
 						src += "$_=$proceed($$); new ist.meic.pa.History().saveObject($_"
-								+ ",\" <- "
+								+ ",\"  <- "
 								+ newEx.getConstructor().getLongName()
 								+ " on "
 								+ newEx.getFileName()
 								+ ":"
 								+ newEx.getLineNumber() + "\");";
 					} catch (NotFoundException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}
 
@@ -95,41 +66,42 @@ public class TraceTranslator implements Translator {
 				public void edit(MethodCall m) throws CannotCompileException {
 					try {
 						if (m.getClassName().startsWith("ist.meic.pa.History")
-								|| 
-								m.getMethod().getLongName()
-										.startsWith("java.lang"))
-								/*|| m.getMethod().getLongName()
-										.startsWith("java.util"))*/
+								|| m.getMethod().getLongName()
+										.startsWith("java.lang")
+								|| Modifier.isNative(m.getMethod().getModifiers())
+								|| Modifier.isStrict(m.getMethod().getModifiers())
+								|| Modifier.isTransient(m.getMethod().getModifiers()))
+							/*
+							 * || m.getMethod().getLongName()
+							 * .startsWith("java.util"))
+							 */
 							return;
 
-						System.out.println(m.getMethodName() + " "
-								//+ m.getMethod().getDeclaringClass() + "  "
+						/*System.out.println(m.getMethodName() + " "
 								+ m.getFileName() + " at line: "
-								+ m.getLineNumber());
+								+ m.getLineNumber());*/
 
 						String methodCall = "";
 						for (int i = 1; i <= m.getMethod().getParameterTypes().length; i++) {
 							methodCall += " if(!$" + i
 									+ ".getClass().isPrimitive()) "
 									+ "	new ist.meic.pa.History().saveObject($"
-									+ i + ",\" -> "
+									+ i + ",\"  -> "
 									+ m.getMethod().getLongName() + " on "
 									+ m.getFileName() + ":" + m.getLineNumber()
 									+ "\"); ";
 						}
-						methodCall += "$_=$proceed($$);if($_ != null && !$_.getClass().isPrimitive()) "
-								+ "new ist.meic.pa.History().saveObject($_,\" <- "
-								+ m.getMethod().getLongName()
-								+ " on "
-								+ m.getFileName()
-								+ ":"
-								+ m.getLineNumber()
+						methodCall += "$_=$proceed($$);"
+								+ "if($_ != null && !$_.getClass().isPrimitive()) "
+								+ "new ist.meic.pa.History().saveObject($_,\"  <- "
+								+ m.getMethod().getLongName() + " on "
+								+ m.getFileName() + ":" + m.getLineNumber()
 								+ "\");";
-						
 						m.replace(methodCall);
 					} catch (NotFoundException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+					}catch (Exception e) {
+						//e.printStackTrace();
 					}
 				}
 
