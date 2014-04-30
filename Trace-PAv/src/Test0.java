@@ -1,8 +1,13 @@
-package ist.meic.pa.test;
-
 import ist.meic.pa.Trace;
 
-public class Test {
+public class Test0 {
+
+	public static void main(String[] args) {
+		(new Test()).test();
+	}
+
+}
+class Test {
 
 	public Test() {
 		// System.out.println("NEW TEST");
@@ -21,11 +26,9 @@ public class Test {
 	}
 
 	public void test() {
-
 		Trace.print(foo());
-		Object b = identity(bar());
-		Trace.print(b);
-		//Trace.print(identity(b));
+		Object b = bar();
+		Trace.print(identity(b));
 	}
 
 }

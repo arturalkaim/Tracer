@@ -22,41 +22,33 @@ public class TraceTranslator implements Translator {
 
 	private void makeTracable(CtClass ctClass, final ClassPool pool)
 			throws CannotCompileException, NotFoundException {
+		// System.out.println(ctClass.getName());
 		if (ctClass.getPackageName().equals("ist.meic.pa")
 				&& !ctClass.getName().equals("ist.meic.pa.Trace"))
 			return;
-		for (CtMethod ctMethod : ctClass.getDeclaredMethods()) {
+		for (final CtMethod ctMethod : ctClass.getDeclaredMethods()) {
 			methodSaveArgs = "";
 			methodSaveReturn = "";
 			/*
 			 * System.out.println(ctMethod.getLongName() + "   " +
 			 * ctMethod.getParameterTypes().length);
+			 * 
+			 * if (ctMethod.getParameterTypes().length == 0) continue;
 			 */
-			if (ctMethod.getParameterTypes().length == 0)
-				continue;
-			/*methodSaveArgs += "try {"
-					+ " Class ca = Class.forName(\"ist.meic.pa.History\");"
-					+ "	java.lang.reflect.Method ca = ca.getMethod(\"saveObject\", new Class[]{Object.class,String.class}); "
-					+ "ca.setAccessible(true);";*/
 			for (int i = 1; i <= ctMethod.getParameterTypes().length; i++) {
-				methodSaveArgs += " new ist.meic.pa.History().saveObject($"+i+",\"-> \"+$" + i + ".toString()+ \"  " + ctMethod.getLongName()
-						+ " on " + ctMethod.getGenericSignature() + ":"
-						+ ctMethod.getMethodInfo().getLineNumber(0) + "\");";
-				/*methodSaveArgs += "ca.invoke(null, new Object[] {$"
-						// + new ist.meic.pa.test.Test()"
-						+ i + ", \"-> \"+$" + i + ".toString()+ \"  " + ctMethod.getLongName()
-						+ " on " + ctMethod.getGenericSignature() + ":"
-						+ ctMethod.getMethodInfo().getLineNumber(0) + "\"});";*/
+				methodSaveArgs += " new ist.meic.pa.History().saveObject(\"-> "+ctMethod.getLongName()+"\",$" + i
+						+ ");";
 			}
-			/*methodSaveArgs += "	} catch (ClassNotFoundException e) {"
-					+ "		e.printStackTrace();"
-					+ "	} catch (NoSuchMethodException e) {"
-					+ "		e.printStackTrace();"
-					+ "	} catch (SecurityException e) {"
-					+ "		e.printStackTrace();" + "	}";*/
 			ctMethod.insertBefore(methodSaveArgs);
-			// ctMethod.insertBefore(methodSaveArgs);
-			methodSaveReturn += "try {"
+
+			/*
+			 * methodSaveArgs +=
+			 * " new ist.meic.pa.History().saveObject($_,\"-> " +
+			 * ctMethod.getLongName() + " on " + ctMethod.getGenericSignature()
+			 * + ":" + ctMethod.getMethodInfo().getLineNumber(0) + "\");";
+			 */
+			methodSaveReturn += " new ist.meic.pa.History().saveObject(\"<- "+ctMethod.getLongName()+"\",$_ );";
+			/*methodSaveReturn = "try {"
 					+ " Class ca = Class.forName(\"ist.meic.pa.History\");"
 					+ "	java.lang.reflect.Method ca = ca.getMethod(\"saveObject\", new Class[]{Object.class,String.class}); "
 					+ "ca.setAccessible(true);"
@@ -70,26 +62,86 @@ public class TraceTranslator implements Translator {
 					+ "		e.printStackTrace();"
 					+ "	} catch (SecurityException e) {"
 					+ "		e.printStackTrace();" + "	}";
-
+*/
 			ctMethod.insertAfter(methodSaveReturn);
 
-			/*
-			 * instrument(new ExprEditor() { public void edit(NewExpr newEx)
-			 * throws CannotCompileException { String src = ""; /*
-			 * System.out.println(newEx.getClassName() + " " +
-			 * newEx.getFileName() + " at line: " + newEx.getLineNumber());
-			 * 
-			 * methodSaveArgs += "try {" + "$_ = $proceed($$);" +
-			 * " Class ca = Class.forName(\"ist.meic.pa.History\");" +
-			 * "	java.lang.reflect.Method ca = ca.getMethod(\"saveObject\", new Class[]{Object.class,String.class}); "
-			 * + "ca.setAccessible(true);" + "ca.invoke(null, new Object[] {$_"
-			 * + ", \"-> " + newEx.getSignature() + " on " + newEx.getFileName()
-			 * + ":" + newEx.getLineNumber() + "\"});" +
-			 * "	} catch (ClassNotFoundException e) {" +
-			 * "		e.printStackTrace();" + "	} catch (NoSuchMethodException e) {"
-			 * + "		e.printStackTrace();" + "	} catch (SecurityException e) {" +
-			 * "		e.printStackTrace();" + "	}";
-			 */
+			ctMethod.instrument(new ExprEditor() {
+				public void edit(NewExpr newEx) throws CannotCompileException {
+					if (newEx.getClassName().startsWith("ist.meic.pa.History"))
+						return;
+					String src = "";
+					/*
+					 * System.out.println(newEx.getClassName() + " " +
+					 * newEx.getFileName() + " at line: " +
+					 * newEx.getLineNumber());
+					 */
+					try {
+						src += "$_=$proceed($$); new ist.meic.pa.History().saveObject($_"
+								+ ",\"<- "
+								+ newEx.getConstructor().getLongName()
+								+ " on "
+								+ newEx.getFileName()
+								+ ":"
+								+ newEx.getLineNumber() + "\");";
+					} catch (NotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+
+					newEx.replace(src);
+				}
+
+				@Override
+				public void edit(MethodCall m) throws CannotCompileException {
+					if (m.getClassName().startsWith("ist.meic.pa.History"))
+						return;
+					try {
+						String methodCall = "";
+						methodCall += " new ist.meic.pa.History().saveCall("
+								+ "\" on " + m.getFileName()+ ":"
+								+ m.getLineNumber() + "\","
+								+ m.where().getParameterTypes().length + ");";
+						m.getMethod().insertBefore(methodCall);
+						/*
+																 * methodSaveArgs
+																 * = ""; for
+																 * (int i = 1; i
+																 * <= ctMethod.
+																 * getParameterTypes
+																 * ().length;
+																 * i++) {
+																 * methodSaveArgs
+																 * +=
+																 * " new ist.meic.pa.History().saveObject($"
+																 * + i + ");"; }
+																 * ctMethod
+																 * .insertBefore
+																 * (
+																 * methodSaveArgs
+																 * );
+																 */
+					} catch (NotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				}
+
+				/*
+				 * src += "try {" +
+				 * " Class ca = Class.forName(\"ist.meic.pa.History\");" +
+				 * "	java.lang.reflect.Method ca = ca.getMethod(\"saveObject\", new Class[]{Object.class,String.class}); "
+				 * + "ca.setAccessible(true);" +
+				 * "ca.invoke(null, new Object[] {$_" + ", \"-> " +
+				 * newEx.getSignature() + " on " + newEx.getFileName() + ":" +
+				 * newEx.getLineNumber() + "\"});" +
+				 * "	} catch (ClassNotFoundException e) {" +
+				 * "		e.printStackTrace();" +
+				 * "	} catch (NoSuchMethodException e) {" +
+				 * "		e.printStackTrace();" + "	} catch (SecurityException e) {"
+				 * + "		e.printStackTrace();" + "	}";
+				 */
+
+			});
 			/*
 			 * try { newEx.getConstructor().insertAfter(src); } catch
 			 * (NotFoundException e) { // TODO Auto-generated catch block
