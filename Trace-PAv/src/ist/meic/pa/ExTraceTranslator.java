@@ -11,6 +11,7 @@ import javassist.Translator;
 import javassist.expr.Cast;
 import javassist.expr.ExprEditor;
 import javassist.expr.FieldAccess;
+import javassist.expr.Handler;
 import javassist.expr.MethodCall;
 import javassist.expr.NewExpr;
 
@@ -152,7 +153,6 @@ public class ExTraceTranslator implements Translator {
 						f.replace(src);
 
 					} else if (f.isWriter()) {
-
 						src += "new ist.meic.pa.History().saveObject($0"
 								+ ",\" SET " + f.getFieldName() + " on "
 								+ f.getFileName() + ":" + f.getLineNumber()
@@ -161,6 +161,11 @@ public class ExTraceTranslator implements Translator {
 					}
 				}
 
+				@Override
+				public void edit(Handler h) throws CannotCompileException {
+					
+				}
+				
 			});
 		}
 
