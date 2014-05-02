@@ -19,29 +19,6 @@ public class History {
 			history.put(o, aux);
 		}
 	}
-	
-	public static void saveObject(String trace, Object o) {
-		if (o == null)
-			return;
-		/*System.out.println(o.toString() + " " + trace + temp + "  " + temp_nargs);
-		if(temp_nargs!=0){
-			trace += temp;
-			temp_nargs--;
-		}else
-			return;*/
-		trace += temp;
-		if (history.containsKey(o)) {
-			history.get(o).add(trace);
-		} else {
-			ArrayList<String> aux = new ArrayList<String>();
-			aux.add(trace);
-			history.put(o, aux);
-		}
-	}
-	public static void saveCall(String trace, int nargs) {
-		temp = trace;
-		temp_nargs = nargs;
-	}
 
 	public void print(Object foo) {
 		//System.out.println(foo.hashCode());

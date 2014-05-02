@@ -145,27 +145,37 @@ public class ExTraceTranslator implements Translator {
 					if (f.isStatic())
 						return;
 					if (f.isReader()) {
-						src += "$_=$0." +f.getFieldName()
-								+ "; new ist.meic.pa.History().saveObject($_"
+						src += "$_=$0."
+								+ f.getFieldName()
+								+ ";"
+								// ;src += "; if($r.getClass().isPrimitive())"
+								+ " new ist.meic.pa.History().saveObject(($w)$_"
 								+ ",\" GET " + f.getFieldName() + " on "
 								+ f.getFileName() + ":" + f.getLineNumber()
 								+ "\");";
 						f.replace(src);
 
 					} else if (f.isWriter()) {
-						src += "new ist.meic.pa.History().saveObject($0"
-								+ ",\" SET " + f.getFieldName() + " on "
-								+ f.getFileName() + ":" + f.getLineNumber()
-								+ "\");";
+						src += "$0." + f.getFieldName() + "=$1;";
+						src += "new ist.meic.pa.History().saveObject(($w)$1"
+								+ ",\" SET \"" + "+$0+\"." + f.getFieldName()
+								+ " on " + f.getFileName() + ":"
+								+ f.getLineNumber() + "\");";
 						f.replace(src);
 					}
 				}
 
 				@Override
 				public void edit(Handler h) throws CannotCompileException {
-					
+					try {
+						System.out.println(" COISAS " + h.getType().getName() + " " 
+								+ h.getEnclosingClass().getSimpleName());
+
+					} catch (NotFoundException e) {
+						e.printStackTrace();
+					}
 				}
-				
+
 			});
 		}
 
