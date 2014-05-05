@@ -10,6 +10,7 @@ import javassist.NotFoundException;
 import javassist.Translator;
 import javassist.expr.ExprEditor;
 import javassist.expr.MethodCall;
+import javassist.expr.NewArray;
 import javassist.expr.NewExpr;
 
 public class TraceTranslator implements Translator {
@@ -58,31 +59,25 @@ public class TraceTranslator implements Translator {
 								+ newEx.getFileName()
 								+ ":"
 								+ newEx.getLineNumber() + "\");";
+						newEx.replace(src);
 					} catch (NotFoundException e1) {
 						e1.printStackTrace();
 					}
 
-					newEx.replace(src);
 				}
 
 				@Override
 				public void edit(MethodCall m) throws CannotCompileException {
 					try {
-						if (m.getClassName().startsWith("ist.meic.pa.History")
+						if (m.getClassName().startsWith("ist.meic.pa.History"))/*
 								|| m.getMethod().getLongName()
-										.startsWith("java.lang")
-								|| Modifier.isNative(m.getMethod().getModifiers())
-								|| Modifier.isStrict(m.getMethod().getModifiers())
-								|| Modifier.isTransient(m.getMethod().getModifiers()))
-							/*
-							 * || m.getMethod().getLongName()
-							 * .startsWith("java.util"))
-							 */
+										.startsWith("java.lang"))*/
 							return;
 
-						/*System.out.println(m.getMethodName() + " "
-								+ m.getFileName() + " at line: "
-								+ m.getLineNumber());*/
+						/*
+						 * System.out.println(m.getMethodName() + " " +
+						 * m.getFileName() + " at line: " + m.getLineNumber());
+						 */
 
 						String methodCall = "";
 						for (int i = 1; i <= m.getMethod().getParameterTypes().length; i++) {
@@ -103,9 +98,30 @@ public class TraceTranslator implements Translator {
 						m.replace(methodCall);
 					} catch (NotFoundException e) {
 						e.printStackTrace();
-					}catch (Exception e) {
-						//e.printStackTrace();
+					} catch (Exception e) {
+						// e.printStackTrace();
 					}
+				}
+
+				@Override
+				public void edit(NewArray arr) throws CannotCompileException {
+					try {
+						String src = "";
+						System.out.println(" NEW ARRAY "+arr.getComponentType().getSimpleName());
+						src += "$_= ($r) $proceed("+arr.getDimension()+"); new ist.meic.pa.History().saveObject($_"
+								+ ",\"  <- NEW "
+								+ arr.getComponentType().getName()
+								+ " ARRAY on "
+								+ arr.getFileName()
+								+ ":"
+								+ arr.getLineNumber()
+								+ "\");";
+						arr.replace(src);
+
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					
 				}
 
 			});

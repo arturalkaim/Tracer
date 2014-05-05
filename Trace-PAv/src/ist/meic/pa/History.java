@@ -2,9 +2,10 @@ package ist.meic.pa;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 
 public class History {
-	static HashMap<Object, ArrayList<String>> history = new HashMap<Object, ArrayList<String>>();
+	static IdentityHashMap<Object, ArrayList<String>> history = new IdentityHashMap<Object, ArrayList<String>>();
 	static String temp = "";
 	static int temp_nargs;
 	public static void saveObject(Object o, String trace) {

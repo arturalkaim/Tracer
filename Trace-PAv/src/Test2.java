@@ -28,11 +28,11 @@ class Test {
 
 	public void test() {
 		Object o = new String("MyCastedObj");
-		
-
-		
 		String s = (String) identity(o);
 		m = new HashMap();
+		Object[] arr= new Object[1];
+		arr[0]=o;
+		identity(o);
 		m.put(2, o);
 		m.get(2);
 		int ji = 0;
@@ -41,6 +41,9 @@ class Test {
 		t.i = 12;
 		Trace.print(t.i);
 		t.sa = "SERA QUE SIM";
+
+		Trace.print(arr);
+		Trace.print(arr[0]);
 		for (Object obj : m.values()) {
 			System.out.println(obj);
 		}
