@@ -22,44 +22,15 @@ public class TraceTranslator implements Translator {
 
 	private void makeTracable(CtClass ctClass, final ClassPool pool)
 			throws CannotCompileException, NotFoundException {
-		// System.out.println(ctClass.getName());
 		if (ctClass.getPackageName() != null
 				&& ctClass.getPackageName().equals("ist.meic.pa")
 				&& !ctClass.getName().equals("ist.meic.pa.Trace"))
 			return;
-		for (final CtMethod ctMethod : ctClass.getDeclaredMethods()) {
-			methodSaveArgs = "";
-			methodSaveReturn = "";
-			if (ctMethod.isEmpty()
-					|| Modifier.isNative(ctMethod.getModifiers())
-					|| Modifier.isTransient(ctMethod.getModifiers()))
-				continue;
-
-			ctMethod.insertAfter(methodSaveReturn);
+		for (final CtBehavior ctMethod : ctClass.getDeclaredBehaviors()) {
 
 			ctMethod.instrument(new ExprEditor() {
 				public void edit(NewExpr newEx) throws CannotCompileException {
-					if (newEx.getClassName().startsWith("ist.meic.pa.History"))
-						return;
-					String src = "";
-					/*
-					 * System.out.println(newEx.getClassName() + " " +
-					 * newEx.getFileName() + " at line: " +
-					 * newEx.getLineNumber());
-					 */
-					try {
-						src += "$_=$proceed($$); new ist.meic.pa.History().saveObject($_"
-								+ ",\"  <- "
-								+ newEx.getConstructor().getLongName()
-								+ " on "
-								+ newEx.getFileName()
-								+ ":"
-								+ newEx.getLineNumber() + "\");";
-					} catch (NotFoundException e1) {
-						e1.printStackTrace();
-					}
-
-					newEx.replace(src);
+					newExprEval(newEx);
 				}
 
 				@Override
@@ -67,14 +38,7 @@ public class TraceTranslator implements Translator {
 					try {
 						if (m.getClassName().startsWith("ist.meic.pa.History")
 								|| m.getMethod().getLongName()
-										.startsWith("java.lang")
-								|| Modifier.isNative(m.getMethod().getModifiers())
-								|| Modifier.isStrict(m.getMethod().getModifiers())
-								|| Modifier.isTransient(m.getMethod().getModifiers()))
-							/*
-							 * || m.getMethod().getLongName()
-							 * .startsWith("java.util"))
-							 */
+										.startsWith("java.lang"))
 							return;
 
 						/*System.out.println(m.getMethodName() + " "
@@ -83,25 +47,14 @@ public class TraceTranslator implements Translator {
 
 						String methodCall = "";
 						for (int i = 1; i <= m.getMethod().getParameterTypes().length; i++) {
-							methodCall += " if(!$" + i
-									+ ".getClass().isPrimitive()) "
-									+ "	new ist.meic.pa.History().saveObject($"
-									+ i + ",\"  -> "
-									+ m.getMethod().getLongName() + " on "
-									+ m.getFileName() + ":" + m.getLineNumber()
-									+ "\"); ";
+							methodCall = saveObjectArg(m, methodCall, i);
 						}
-						methodCall += "$_=$proceed($$);"
-								+ "if($_ != null && !$_.getClass().isPrimitive()) "
-								+ "new ist.meic.pa.History().saveObject($_,\"  <- "
-								+ m.getMethod().getLongName() + " on "
-								+ m.getFileName() + ":" + m.getLineNumber()
-								+ "\");";
+						methodCall = saveObjectRet(m, methodCall);
 						m.replace(methodCall);
 					} catch (NotFoundException e) {
 						e.printStackTrace();
 					}catch (Exception e) {
-						//e.printStackTrace();
+						e.printStackTrace();
 					}
 				}
 
@@ -114,6 +67,53 @@ public class TraceTranslator implements Translator {
 	public void start(ClassPool arg0) throws NotFoundException,
 			CannotCompileException {
 
+	}
+
+	private void newExprEval(NewExpr newEx) throws CannotCompileException {
+		if (newEx.getClassName().startsWith("ist.meic.pa.History"))
+			return;
+		String src = "";
+		/*
+		 * System.out.println(newEx.getClassName() + " " +
+		 * newEx.getFileName() + " at line: " +
+		 * newEx.getLineNumber());
+		 */
+		try {
+			src += "$_=$proceed($$); ist.meic.pa.History.saveObject($_"
+					+ ",\"  <- "
+					+ newEx.getConstructor().getLongName()
+					+ " on "
+					+ newEx.getFileName()
+					+ ":"
+					+ newEx.getLineNumber() + "\");";
+		} catch (NotFoundException e1) {
+			e1.printStackTrace();
+		}
+
+		newEx.replace(src);
+	}
+
+	private String saveObjectArg(MethodCall m, String methodCall, int i)
+			throws NotFoundException {
+		methodCall += " if(!$" + i
+				+ ".getClass().isPrimitive()) "
+				+ "	ist.meic.pa.History.saveObject($"
+				+ i + ",\"  -> "
+				+ m.getMethod().getLongName() + " on "
+				+ m.getFileName() + ":" + m.getLineNumber()
+				+ "\"); ";
+		return methodCall;
+	}
+
+	private String saveObjectRet(MethodCall m, String methodCall)
+			throws NotFoundException {
+		methodCall += "$_=$proceed($$);"
+				+ "if((($w)$_) != null && !(($w)$_).getClass().isPrimitive()) "
+				+ " ist.meic.pa.History.saveObject(($w)$_,\"  <- "
+				+ m.getMethod().getLongName() + " on "
+				+ m.getFileName() + ":" + m.getLineNumber()
+				+ "\");";
+		return methodCall;
 	}
 
 }
