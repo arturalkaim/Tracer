@@ -18,6 +18,10 @@ class Test {
 	public Test(){
 		
 	}
+	
+	public Object foo(int a){
+		return new String("FOO"+a);
+	}
 	public Test(Object o){
 		identity(o);
 	}
@@ -26,24 +30,25 @@ class Test {
 	}
 
 	public void test() {
-		Object o = new String("MyObj");
+		Object o = foo(12);
 		Object[] arr = {new String("TEST"),new String("TEST")};
 		identity(o);
 		
 		new Test(o);
 		
-		m.put(2, o);
+		m.put(5, o);
+		m.put(2, arr);
 		m.get(2);
 		Trace.print(o);
 		Trace.print(obj);
 		Trace.print(ias);
-
+		
 		for(;forTest(o);){}
 		
-		/*for(Iterator<Object> i = m.entrySet().iterator(); i.hasNext(); ) {
+		for(Iterator<Object> i = m.entrySet().iterator(); i.hasNext(); ) {
 			Object item = i.next();
 		    System.out.println(item);
-		}*/
+		}
 		
 		for (Object obj : m.values()) {
 			System.out.println(obj);
