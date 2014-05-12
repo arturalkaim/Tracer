@@ -1,11 +1,14 @@
 package ist.meic.pa;
 
-import javassist.*;
-import javassist.expr.*;
-
-import java.io.*;
-import java.lang.reflect.*;
-import java.lang.reflect.Modifier;
+import javassist.CannotCompileException;
+import javassist.ClassPool;
+import javassist.CtBehavior;
+import javassist.CtClass;
+import javassist.NotFoundException;
+import javassist.Translator;
+import javassist.expr.ExprEditor;
+import javassist.expr.MethodCall;
+import javassist.expr.NewExpr;
 
 public class TraceTranslator implements Translator {
 

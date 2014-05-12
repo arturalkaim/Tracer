@@ -1,0 +1,33 @@
+<project name="Tracer" basedir="." default="create-jar">
+	<property name="src.dir" location="src" />
+	<property name="classes.dir" location="classes" />
+	<property name="lib.dir" location="lib" />
+	<property name="jar.file" location="tracer.jar" />
+	<path id="project.classpath">
+		<pathelement location="${classes.dir}" />
+		<fileset dir="${lib.dir}">
+			<include name="**/*.jar" />
+		</fileset>
+	</path>
+	<target name="init">
+		<mkdir dir="${classes.dir}" />
+	</target>
+	<target name="clean">
+		<delete dir="${classes.dir}" />
+		<delete file="${jar.file}" />
+	</target>
+	<target name="compile" depends="clean,init">
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" debug="true"
+			includeantruntime="false">
+			<classpath>
+				<path refid="project.classpath" />
+			</classpath>
+		</javac>
+	</target>
+	<target name="create-jar" depends="compile">
+		<jar destfile="${jar.file}">
+			<fileset dir="${classes.dir}" />
+			<fileset dir="${src.dir}" />
+		</jar>
+	</target>
+</project>
