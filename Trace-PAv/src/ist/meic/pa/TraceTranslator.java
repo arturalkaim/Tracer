@@ -63,6 +63,9 @@ public class TraceTranslator implements Translator {
 		 * " at line: " + newEx.getLineNumber());
 		 */
 		try {
+			for (int i = 1; i <= newEx.getConstructor().getParameterTypes().length; i++) {
+				src = saveObjectArgNewString(newEx, src, i);
+			}
 			src += "$_=$proceed($$); ist.meic.pa.History.saveObject(($w)$_"
 					+ ",\"  <- " + newEx.getConstructor().getLongName()
 					+ " on " + newEx.getFileName() + ":"
@@ -74,6 +77,15 @@ public class TraceTranslator implements Translator {
 		return src;
 	}
 
+	private String saveObjectArgNewString(NewExpr m, String methodCall, int i)
+			throws NotFoundException {
+		methodCall += " if(!(($w)$" + i + ").getClass().isPrimitive()) "
+				+ "	ist.meic.pa.History.saveObject((($w)$" + i + "),\"  -> "
+				+ m.getConstructor().getLongName() + " on " + m.getFileName() + ":"
+				+ m.getLineNumber() + "\");";
+		return methodCall;
+	}
+	
 	private String saveObjectArgString(MethodCall m, String methodCall, int i)
 			throws NotFoundException {
 		methodCall += " if(!(($w)$" + i + ").getClass().isPrimitive()) "
