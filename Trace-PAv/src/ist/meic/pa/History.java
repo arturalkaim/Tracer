@@ -20,7 +20,7 @@ public class History {
 		}
 	}
 
-	public void print(Object foo) {
+	static public void print(Object foo) {
 		if (foo != null && history.containsKey(foo)) {
 			System.err.println("Tracing for " + foo.toString());
 			for (String s : history.get(foo))
