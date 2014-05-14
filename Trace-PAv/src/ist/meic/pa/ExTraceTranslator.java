@@ -81,7 +81,7 @@ public class ExTraceTranslator implements Translator {
 				@Override
 				public void edit(Cast c) throws CannotCompileException {
 					String src = "";
-
+					System.out.println("PRINT CAST");
 					try {
 						src += "$_=$proceed($$); ist.meic.pa.History.saveObject($_"
 								+ ",\" CAST "
@@ -98,33 +98,33 @@ public class ExTraceTranslator implements Translator {
 
 				}
 
-				
 				@Override
 				public void edit(FieldAccess f) throws CannotCompileException {
 					String src = "";
-					System.out.println("Coisas: " + f.getFieldName() + " " + f.getLineNumber());
 					if (f.isStatic())
 						return;
 					if (f.isReader()) {
+						// System.out.println("Coisas: " + f.getFieldName() +
+						// " " + f.getLineNumber());
 						src = "$_=$0."
 								+ f.getFieldName()
 								+ ";"
-								+ " ist.meic.pa.History.saveObject($0"// + f.getFieldName()
-								+ ",\" GET " + f.getFieldName() + " on "
-								+ f.getFileName() + ":" + f.getLineNumber()
-								+ "\");";
+								+ " ist.meic.pa.History.saveObject($_"// +
+																		// f.getFieldName()
+								+ ",\" GET " + f.getFieldName()
+								+ " on \"+$_+\"" + f.getFileName() + ":"
+								+ f.getLineNumber() + "\");";
 						f.replace(src);
 
 					} else if (f.isWriter()) {
-						src = "$0." + f.getFieldName() + "=$1;";
-						src += "ist.meic.pa.History.saveObject($0"
-								+ ",\" SET " + f.getFieldName()
-								+ " on " + f.getFileName() + ":"
-								+ f.getLineNumber() + "\");";
+						src = "ist.meic.pa.History.saveObject($1" + ",\" SET "
+								+ f.getFieldName() + " on " + f.getFileName()
+								+ ":" + f.getLineNumber() + "\");";
+						src += "$0." + f.getFieldName() + " = $1;";
 						f.replace(src);
 					}
 				}
-				
+
 				@Override
 				public void edit(Handler h) throws CannotCompileException {
 					try {

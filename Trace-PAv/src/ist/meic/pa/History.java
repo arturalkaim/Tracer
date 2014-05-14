@@ -11,7 +11,7 @@ public class History {
 	public static void saveObject(Object o, String trace) {
 		if (o == null)
 			return;
-		//System.out.println(o.hashCode() + trace);
+		//System.out.println(o + " " + trace);
 		if (history.containsKey(o)) {
 			history.get(o).add(trace);
 		} else {

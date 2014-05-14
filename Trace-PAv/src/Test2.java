@@ -17,7 +17,6 @@ class Test {
 		public Integer i;
 		public String sa;
 		toto(Integer i){
-			Trace.print(i);
 			this.i = i;
 			this.sa = new String("coisas");
 		}
@@ -25,11 +24,13 @@ class Test {
 		public void trou() throws NotFoundException{
 			throw new NotFoundException("olá");
 		}
+		
+		
 	}
 
 	public void test() {
-		Object o = new String("MyCastedObj");
-		String s = (String) identity(o);
+		Object o =	(Object) new String("MyCastedObj");
+		String s = 	(String) identity(o);
 		m = new HashMap();
 		Object[] arr= new Object[1];
 		arr[0]=o;
