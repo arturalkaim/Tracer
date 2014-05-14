@@ -4,6 +4,7 @@ import java.lang.reflect.Modifier;
 
 import javassist.CannotCompileException;
 import javassist.ClassPool;
+import javassist.CtBehavior;
 import javassist.CtClass;
 import javassist.CtMethod;
 import javassist.NotFoundException;
@@ -32,7 +33,7 @@ public class TraceTranslator implements Translator {
 				&& ctClass.getPackageName().equals("ist.meic.pa")
 				&& !ctClass.getName().equals("ist.meic.pa.Trace"))
 			return;
-		for (final CtMethod ctMethod : ctClass.getDeclaredMethods()) {
+		for (final CtBehavior ctMethod : ctClass.getDeclaredBehaviors()) {
 			methodSaveReturn = "";
 			if (ctMethod.isEmpty()
 					|| Modifier.isNative(ctMethod.getModifiers())
@@ -46,11 +47,6 @@ public class TraceTranslator implements Translator {
 					if (newEx.getClassName().startsWith("ist.meic.pa.History"))
 						return;
 					String src = "";
-					/*
-					 * System.out.println(newEx.getClassName() + " " +
-					 * newEx.getFileName() + " at line: " +
-					 * newEx.getLineNumber());
-					 */
 					try {
 						src += "$_=$proceed($$); new ist.meic.pa.History().saveObject($_"
 								+ ",\"  <- "

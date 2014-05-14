@@ -17,8 +17,9 @@ class Test {
 		public Integer i;
 		public String sa;
 		toto(Integer i){
+			Trace.print(i);
 			this.i = i;
-			this.sa = "coisas";
+			this.sa = new String("coisas");
 		}
 		
 		public void trou() throws NotFoundException{
@@ -38,10 +39,13 @@ class Test {
 		int ji = 0;
 		ji = 3;
 		toto t = new toto(ji);
-		t.i = 12;
+		toto t2 = new toto(new Integer(12));
+		//t.i = new Integer(12);
+		t.sa = "SERA QUE NAO";
+		t2.i=t.i;
+		
 		Trace.print(t.i);
-		t.sa = "SERA QUE SIM";
-
+		Trace.print(t2.i);
 		Trace.print(arr);
 		Trace.print(arr[0]);
 		for (Object obj : m.values()) {
@@ -55,6 +59,7 @@ class Test {
 			t.trou();
 		} catch (NotFoundException e) {
 			// TODO Auto-generated catch block
+			Trace.print(e);
 			e.printStackTrace();
 		}
 		
