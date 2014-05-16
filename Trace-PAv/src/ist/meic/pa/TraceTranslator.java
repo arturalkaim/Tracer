@@ -23,7 +23,7 @@ public class TraceTranslator implements Translator {
 
 	}
 
-	private void makeTracable(CtClass ctClass, final ClassPool pool)
+	protected void makeTracable(CtClass ctClass, final ClassPool pool)
 			throws CannotCompileException, NotFoundException {
 		for (final CtBehavior ctMethod : ctClass.getDeclaredBehaviors()) {
 			ctMethod.instrument(new ExprEditor() {

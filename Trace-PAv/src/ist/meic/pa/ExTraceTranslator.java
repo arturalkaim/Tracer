@@ -15,23 +15,12 @@ import javassist.expr.NewExpr;
 
 public class ExTraceTranslator extends TraceTranslator {
 
-	@Override
-	public void onLoad(ClassPool pool, String className)
-			throws NotFoundException, CannotCompileException {
-		CtClass ctClass = pool.get(className);
-		makeTracable(ctClass, pool);
 
-	}
-
-	@Override
-	public void start(ClassPool arg0) throws NotFoundException,
-			CannotCompileException {
-
-	}
-
-	private void makeTracable(CtClass ctClass, final ClassPool pool)
+	protected void makeTracable(CtClass ctClass, final ClassPool pool)
 			throws CannotCompileException, NotFoundException {
 		String methodSaveReturn;
+		super.makeTracable(ctClass, pool);
+		
 		for (final CtBehavior ctMethod : ctClass.getDeclaredBehaviors()) {
 			methodSaveReturn = "";
 
@@ -64,7 +53,7 @@ public class ExTraceTranslator extends TraceTranslator {
 						} else {
 							handle = handleFinallyReplacer(h);
 						}
-						h.replace(handle);
+						h.insertBefore(handle);
 					} catch (NotFoundException e) {
 						e.printStackTrace();
 					}

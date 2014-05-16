@@ -32,7 +32,7 @@ class Test {
 			return ola;
 		}
 		public void trou(){
-			throw new RuntimeException("Olá: Trou");
+			throw new NullPointerException("Olá: Trou");
 		}
 		
 	}
@@ -63,8 +63,11 @@ class Test {
         
         try {
         	Test.toti asd= new Test.toti();
+        	System.out.println("asd.trou()");
+        	asd.trou();
 		} catch (Exception e) {
 			identity(e);
+			Trace.print(e);
 		}
         
         Trace.print(o);
@@ -75,6 +78,8 @@ class Test {
 public class Test2 {
     public static void main(String args[]) {
     	Test.toti aaa= new Test.toti();
+    	Test bbb = new Test();
+    	bbb.test();
     	aaa.identity(aaa);
         aaa.tete().tete();
         Trace.print(aaa);

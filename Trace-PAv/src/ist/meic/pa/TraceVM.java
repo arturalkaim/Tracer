@@ -14,12 +14,14 @@ import javassist.Translator;
  */
 public class TraceVM {
 
+	
 	/**
 	 * @param args
 	 * @throws Throwable 
 	 */
 	public static void main(String[] args) throws Throwable {
 		if (args.length < 1) {
+			System.err.println("No program to run!");
 		} else {
 			Translator translator = new TraceTranslator();
 			ClassPool pool = ClassPool.getDefault();
