@@ -60,10 +60,6 @@ public class TraceTranslator implements Translator {
 
 	private String newExprEval(NewExpr newEx) throws CannotCompileException {
 		String src = "";
-		/*
-		 * System.out.println(newEx.getClassName() + " " + newEx.getFileName() +
-		 * " at line: " + newEx.getLineNumber());
-		 */
 		try {
 			for (int i = 1; i <= newEx.getConstructor().getParameterTypes().length; i++) {
 				src = saveObjectArgNewString(newEx, src, i);

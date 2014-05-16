@@ -31,7 +31,9 @@ class Test {
 			ola = o;
 			return ola;
 		}
-		
+		public void trou(){
+			throw new RuntimeException("Olá: Trou");
+		}
 		
 	}
 	
@@ -58,7 +60,13 @@ class Test {
         for (Object obj : m.values()) {
             System.out.println(obj);
         }
-
+        
+        try {
+        	Test.toti asd= new Test.toti();
+		} catch (Exception e) {
+			identity(e);
+		}
+        
         Trace.print(o);
 
     }
