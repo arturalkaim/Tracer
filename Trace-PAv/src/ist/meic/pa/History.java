@@ -8,7 +8,8 @@ public class History {
 	static IdentityHashMap<Object, ArrayList<String>> history = new IdentityHashMap<Object, ArrayList<String>>();
 	static String temp = "";
 	static int temp_nargs;
-	public static void saveObject(Object o, String trace) {
+
+	static public void saveObject(Object o, String trace) {
 		if (o == null)
 			return;
 		if (history.containsKey(o)) {
